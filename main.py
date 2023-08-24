@@ -4,13 +4,16 @@ import json
 from collections import Counter
 from fuzzywuzzy import fuzz
 
+# Fetch data from the Stack Exchange API
 response = requests.get("https://api.stackexchange.com/2.3/tags?page=1&pagesize=100&order=desc&sort=popular&site=stackoverflow")
 data = response.json()
 
+# Initialize a list to store tags
 tag_list = []
 for item in data['items']:
     tag_list.append(item['name'])
 
+# Fetch additional pages of tag data
 count = 2
 while count < 26:
     if (data['has_more'] == True) and (data['quota_remaining'] > 10):
@@ -41,8 +44,10 @@ for tag in tag_list:
     if not grouped:
         similar_tags_dict[tag] = [tag]
 
-# Get the top ten most common similar tags
+# Count occurrences of similar tag groups
 similar_tags_counts = {tag: len(similar_group) for tag, similar_group in similar_tags_dict.items()}
+
+# Get the top ten most common similar tags
 top_ten_similar = Counter(similar_tags_counts).most_common(10)
 top_ten_similar_dict = dict(top_ten_similar)
 
